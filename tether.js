@@ -3,8 +3,6 @@ class Tether {
         this.nodes = [];
         this.nodeReferences = {};
         
-        this.validConfig = true;
-        
         this.config = Object.assign({
             el: null,
             data: {},
@@ -18,7 +16,7 @@ class Tether {
     }
     
     mount() {
-        if (! this.validConfig) return;
+        if (! this.validateConfig()) return;
 
         this.nodes = this.extractDocumentNodes(this.config.el === null ? this.templateNodes() : document.querySelector(this.config.el).childNodes);
         
@@ -145,17 +143,25 @@ class Tether {
     }
     
     validateConfig() {
+        let valid = true;
+        
         if (! 'el' in this.config) {
-            this.validConfig = false;
+            valid = false;
             
-            console.error('[Framework]: el is required to mount.');
+            this.logError('el is required to mount.');
         }
         
         if ('el' in this.config && document.querySelector(this.config.el) === null) {
-            this.validConfig = false;
+            valid = false;
             
-            console.error('[Framework]: element ' + this.config.el + ' is not present.');
+            this.logError('element ' + this.config.el + ' is not present.');
         }
+        
+        return valid;
+    }
+    
+    logError() {
+        console.error('[Tether]:', ...arguments);
     }
 
     convertArrayToObject (array, key) {
